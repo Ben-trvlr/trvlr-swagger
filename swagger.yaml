@@ -1,718 +1,5597 @@
----
-swagger: "2.0"
-info:
-  description: "This is a sample server Petstore server.  You can find out more about\
-    \ Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).\
-    \  For this sample, you can use the api key `special-key` to test the authorization\
-    \ filters."
-  version: "1.0.5"
-  title: "Swagger Petstore"
-  termsOfService: "http://swagger.io/terms/"
-  contact:
-    email: "apiteam@swagger.io"
-  license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "petstore.swagger.io"
-basePath: "/v2"
-tags:
-- name: "pet"
-  description: "Everything about your Pets"
-  externalDocs:
-    description: "Find out more"
-    url: "http://swagger.io"
-- name: "store"
-  description: "Access to Petstore orders"
-- name: "user"
-  description: "Operations about user"
-  externalDocs:
-    description: "Find out more about our store"
-    url: "http://swagger.io"
-schemes:
-- "https"
-- "http"
-paths:
-  /pet/{petId}/uploadImage:
-    post:
-      tags:
-      - "pet"
-      summary: "uploads an image"
-      description: ""
-      operationId: "uploadFile"
-      consumes:
-      - "multipart/form-data"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet to update"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "additionalMetadata"
-        in: "formData"
-        description: "Additional data to pass to server"
-        required: false
-        type: "string"
-      - name: "file"
-        in: "formData"
-        description: "file to upload"
-        required: false
-        type: "file"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet:
-    post:
-      tags:
-      - "pet"
-      summary: "Add a new pet to the store"
-      description: ""
-      operationId: "addPet"
-      consumes:
-      - "application/json"
-      - "application/xml"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Pet object that needs to be added to the store"
-        required: true
-        schema:
-          $ref: "#/definitions/Pet"
-      responses:
-        405:
-          description: "Invalid input"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-    put:
-      tags:
-      - "pet"
-      summary: "Update an existing pet"
-      description: ""
-      operationId: "updatePet"
-      consumes:
-      - "application/json"
-      - "application/xml"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Pet object that needs to be added to the store"
-        required: true
-        schema:
-          $ref: "#/definitions/Pet"
-      responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
-        405:
-          description: "Validation exception"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet/findByStatus:
-    get:
-      tags:
-      - "pet"
-      summary: "Finds Pets by status"
-      description: "Multiple status values can be provided with comma separated strings"
-      operationId: "findPetsByStatus"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "status"
-        in: "query"
-        description: "Status values that need to be considered for filter"
-        required: true
-        type: "array"
-        items:
-          type: "string"
-          enum:
-          - "available"
-          - "pending"
-          - "sold"
-          default: "available"
-        collectionFormat: "multi"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid status value"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet/findByTags:
-    get:
-      tags:
-      - "pet"
-      summary: "Finds Pets by tags"
-      description: "Multiple tags can be provided with comma separated strings. Use\
-        \ tag1, tag2, tag3 for testing."
-      operationId: "findPetsByTags"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "tags"
-        in: "query"
-        description: "Tags to filter by"
-        required: true
-        type: "array"
-        items:
-          type: "string"
-        collectionFormat: "multi"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid tag value"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-      deprecated: true
-  /pet/{petId}:
-    get:
-      tags:
-      - "pet"
-      summary: "Find pet by ID"
-      description: "Returns a single pet"
-      operationId: "getPetById"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet to return"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
-      security:
-      - api_key: []
-    post:
-      tags:
-      - "pet"
-      summary: "Updates a pet in the store with form data"
-      description: ""
-      operationId: "updatePetWithForm"
-      consumes:
-      - "application/x-www-form-urlencoded"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet that needs to be updated"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "name"
-        in: "formData"
-        description: "Updated name of the pet"
-        required: false
-        type: "string"
-      - name: "status"
-        in: "formData"
-        description: "Updated status of the pet"
-        required: false
-        type: "string"
-      responses:
-        405:
-          description: "Invalid input"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-    delete:
-      tags:
-      - "pet"
-      summary: "Deletes a pet"
-      description: ""
-      operationId: "deletePet"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "api_key"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "petId"
-        in: "path"
-        description: "Pet id to delete"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /store/order:
-    post:
-      tags:
-      - "store"
-      summary: "Place an order for a pet"
-      description: ""
-      operationId: "placeOrder"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "order placed for purchasing the pet"
-        required: true
-        schema:
-          $ref: "#/definitions/Order"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-        400:
-          description: "Invalid Order"
-  /store/order/{orderId}:
-    get:
-      tags:
-      - "store"
-      summary: "Find purchase order by ID"
-      description: "For valid response try integer IDs with value >= 1 and <= 10.\
-        \ Other values will generated exceptions"
-      operationId: "getOrderById"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "orderId"
-        in: "path"
-        description: "ID of pet that needs to be fetched"
-        required: true
-        type: "integer"
-        maximum: 10
-        minimum: 1
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Order not found"
-    delete:
-      tags:
-      - "store"
-      summary: "Delete purchase order by ID"
-      description: "For valid response try integer IDs with positive integer value.\
-        \ Negative or non-integer values will generate API errors"
-      operationId: "deleteOrder"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "orderId"
-        in: "path"
-        description: "ID of the order that needs to be deleted"
-        required: true
-        type: "integer"
-        minimum: 1
-        format: "int64"
-      responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Order not found"
-  /store/inventory:
-    get:
-      tags:
-      - "store"
-      summary: "Returns pet inventories by status"
-      description: "Returns a map of status codes to quantities"
-      operationId: "getInventory"
-      produces:
-      - "application/json"
-      parameters: []
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: "object"
-            additionalProperties:
-              type: "integer"
-              format: "int32"
-      security:
-      - api_key: []
-  /user/createWithArray:
-    post:
-      tags:
-      - "user"
-      summary: "Creates list of users with given input array"
-      description: ""
-      operationId: "createUsersWithArrayInput"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "List of user object"
-        required: true
-        schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
-  /user/createWithList:
-    post:
-      tags:
-      - "user"
-      summary: "Creates list of users with given input array"
-      description: ""
-      operationId: "createUsersWithListInput"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "List of user object"
-        required: true
-        schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
-  /user/{username}:
-    get:
-      tags:
-      - "user"
-      summary: "Get user by user name"
-      description: ""
-      operationId: "getUserByName"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be fetched. Use user1 for testing. "
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/User"
-        400:
-          description: "Invalid username supplied"
-        404:
-          description: "User not found"
-    put:
-      tags:
-      - "user"
-      summary: "Updated user"
-      description: "This can only be done by the logged in user."
-      operationId: "updateUser"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "name that need to be updated"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "body"
-        description: "Updated user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
-      responses:
-        400:
-          description: "Invalid user supplied"
-        404:
-          description: "User not found"
-    delete:
-      tags:
-      - "user"
-      summary: "Delete user"
-      description: "This can only be done by the logged in user."
-      operationId: "deleteUser"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be deleted"
-        required: true
-        type: "string"
-      responses:
-        400:
-          description: "Invalid username supplied"
-        404:
-          description: "User not found"
-  /user/login:
-    get:
-      tags:
-      - "user"
-      summary: "Logs user into the system"
-      description: ""
-      operationId: "loginUser"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "query"
-        description: "The user name for login"
-        required: true
-        type: "string"
-      - name: "password"
-        in: "query"
-        description: "The password for login in clear text"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          headers:
-            X-Expires-After:
-              type: "string"
-              format: "date-time"
-              description: "date in UTC when token expires"
-            X-Rate-Limit:
-              type: "integer"
-              format: "int32"
-              description: "calls per hour allowed by the user"
-          schema:
-            type: "string"
-        400:
-          description: "Invalid username/password supplied"
-  /user/logout:
-    get:
-      tags:
-      - "user"
-      summary: "Logs out current logged in user session"
-      description: ""
-      operationId: "logoutUser"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters: []
-      responses:
-        default:
-          description: "successful operation"
-  /user:
-    post:
-      tags:
-      - "user"
-      summary: "Create user"
-      description: "This can only be done by the logged in user."
-      operationId: "createUser"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Created user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
-securityDefinitions:
-  api_key:
-    type: "apiKey"
-    name: "api_key"
-    in: "header"
-  petstore_auth:
-    type: "oauth2"
-    authorizationUrl: "https://petstore.swagger.io/oauth/authorize"
-    flow: "implicit"
-    scopes:
-      read:pets: "read your pets"
-      write:pets: "modify pets in your account"
 definitions:
-  ApiResponse:
-    type: "object"
+  Address:
     properties:
-      code:
-        type: "integer"
-        format: "int32"
-      type:
-        type: "string"
-      message:
-        type: "string"
-  Category:
-    type: "object"
-    properties:
+      AddressType:
+        $ref: '#/definitions/pkg_entity.AddressType'
+      AgencyID:
+        type: integer
+      City:
+        type: string
+      CountryCode:
+        type: string
+      CountryName:
+        type: string
+      HotelID:
+        type: integer
+      PostalCode:
+        type: string
+      StateOrProvince:
+        type: string
+      Street:
+        type: string
+      Street2:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
       id:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-    xml:
-      name: "Category"
-  Pet:
-    type: "object"
-    required:
-    - "name"
-    - "photoUrls"
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  Agency:
     properties:
-      id:
-        type: "integer"
-        format: "int64"
-      category:
-        $ref: "#/definitions/Category"
-      name:
-        type: "string"
-        example: "doggie"
-      photoUrls:
-        type: "array"
-        xml:
-          wrapped: true
+      AccountHolderId:
+        type: string
+      AccreditationNumber:
+        type: string
+      AccreditationOrganization:
+        type: string
+      Address:
         items:
-          type: "string"
-          xml:
-            name: "photoUrl"
-      tags:
-        type: "array"
-        xml:
-          wrapped: true
+          $ref: '#/definitions/Address'
+        type: array
+      AgencyUser:
         items:
-          xml:
-            name: "tag"
-          $ref: "#/definitions/Tag"
-      status:
-        type: "string"
-        description: "pet status in the store"
-        enum:
-        - "available"
-        - "pending"
-        - "sold"
-    xml:
-      name: "Pet"
-  Tag:
-    type: "object"
-    properties:
+          $ref: '#/definitions/AgencyUser'
+        type: array
+      BalanceAccountId:
+        type: string
+      CompanyStatus:
+        $ref: '#/definitions/pkg_entity.CompanyStatus'
+      CountryCode:
+        type: string
+      CountryName:
+        type: string
+      Currency:
+        type: string
+      Hide:
+        type: string
+      HostAgency:
+        type: string
+      LegalEntityId:
+        type: string
+      LegalEntityName:
+        type: string
+      LegalRepresentativeId:
+        type: string
+      ListConsortias:
+        type: string
+      ListPreferredPrograms:
+        type: string
+      OnboardingErrors:
+        type: string
+      OrganizationType:
+        type: string
+      PrimaryLogo:
+        type: string
+      PublicEmail:
+        type: string
+      PublicName:
+        type: string
+      PublicPhone:
+        type: string
+      SweepId:
+        type: string
+      TaxId:
+        type: string
+      TaxIdCountry:
+        type: string
+      TaxIdType:
+        type: string
+      Timezone:
+        type: integer
+      TransferInstrumentId:
+        type: string
+      TrvlrEmail:
+        type: string
+      TrvlrPhone:
+        type: string
+      WebSite:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      groups:
+        items:
+          $ref: '#/definitions/Group'
+        type: array
       id:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-    xml:
-      name: "Tag"
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  AgencyCommissionPayout:
+    properties:
+      AdyenTransferID:
+        type: string
+      Agency:
+        $ref: '#/definitions/Agency'
+      AgencyBankPayoutStatus:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_entity.AgencyCommissionPayoutStatus'
+      AgencyID:
+        type: integer
+      AgencyUserID:
+        type: integer
+      AmountSent:
+        type: number
+      CommissionDueUTC:
+        type: string
+      Currency:
+        type: string
+      CurrencySent:
+        type: string
+      DateTransfered:
+        type: string
+      FinalCommissionDue:
+        type: number
+      FxRate:
+        type: number
+      Order:
+        $ref: '#/definitions/Order'
+      OrderID:
+        type: integer
+      agencyUser:
+        $ref: '#/definitions/AgencyUser'
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  AgencyUser:
+    properties:
+      AccessLevel:
+        description: Defines the access level of the agency user
+        type: string
+      Agency:
+        $ref: '#/definitions/Agency'
+      AgencyID:
+        type: integer
+      FirebaseUser:
+        $ref: '#/definitions/FirebaseUser'
+      Orders:
+        items:
+          $ref: '#/definitions/Order'
+        type: array
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  ApCancellationPolicies:
+    properties:
+      Amount:
+        type: number
+      ApRoomBookingsID:
+        type: integer
+      BookingID:
+        description: ProviderRoomId   string          `json:"ProviderRoomId" gorm:"type:varchar(10)"`
+        type: string
+      Currency:
+        type: string
+      EndDate:
+        type: string
+      PolicyId:
+        type: integer
+      ProviderRoomId:
+        description: Are manually inserted in hyperguest_controller, but is manually
+          recovered when the booking is made and when cancel happens so it's important
+          have RoomID and BookingID even if is redundacy.
+        type: integer
+      StartDate:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      id:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  Commission:
+    properties:
+      Agency:
+        $ref: '#/definitions/Agency'
+      AgencyID:
+        type: integer
+      Commission:
+        type: integer
+      Hotel:
+        $ref: '#/definitions/Hotel'
+      HotelID:
+        type: integer
+      Observations:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  Country:
+    properties:
+      AdyenFee:
+        type: number
+      Code:
+        type: string
+      DefaultCurrency:
+        type: string
+      DefaultTimezone:
+        type: integer
+      MerchantAccountId:
+        type: string
+      Name:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  CreditCard:
+    properties:
+      CardBrand:
+        description: '"amex", "cup", "diners", "discover", "mc", "visa"'
+        type: string
+      CardReference:
+        type: string
+      CardToken:
+        type: string
+      EncryptedCardNumber:
+        type: string
+      EncryptedHolderName:
+        type: string
+      EncryptedSecurityCode:
+        type: string
+      ExpiracyDate:
+        type: string
+      HotelID:
+        type: integer
+      IsDefault:
+        type: boolean
+      Last4Digits:
+        type: string
+      ShopperReference:
+        type: string
+      TravelerID:
+        type: integer
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  CustomCommission:
+    properties:
+      AccreditationNumber:
+        type: string
+      AccreditationOrganization:
+        type: string
+      City:
+        type: string
+      Commission:
+        type: integer
+      Country:
+        type: string
+      Email:
+        type: string
+      ID:
+        type: integer
+      Image:
+        type: string
+      IntegrationID:
+        type: string
+      IntegrationInformation: {}
+      NumberOfRooms:
+        type: integer
+      Observations:
+        type: string
+      Phone:
+        type: string
+      PostalCode:
+        type: string
+      PublicName:
+        type: string
+      Source:
+        type: string
+      StateOrProvince:
+        type: string
+      Street:
+        type: string
+      Street2:
+        type: string
+    type: object
+  DhiscoNRC:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      ratePlanCode:
+        type: string
+      ratePlanType:
+        type: string
+      refGroup:
+        $ref: '#/definitions/RefGroup'
+      refGroupID:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  FirebaseUser:
+    properties:
+      AccountOwnerID:
+        type: integer
+      AccountOwnerType:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_entity.AccountOwnerType'
+      Address:
+        type: string
+      AgentReconciliationId:
+        description: the agency reconciliation id is for agencies to track their reconciliation
+        type: string
+      City:
+        type: string
+      CountryCode:
+        type: string
+      CountryName:
+        type: string
+      DateOfBirth:
+        type: string
+      Email:
+        type: string
+      FirebaseUID:
+        type: string
+      Fullname:
+        type: string
+      NamePrefix:
+        type: string
+      Phone:
+        type: string
+      PostalCode:
+        type: string
+      ProfilePhoto:
+        type: string
+      StateOrProvince:
+        type: string
+      Status:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_entity.FbUserStatus'
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  Group:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      foreignKey:GroupID;constraint:OnDelete:SET NULL:
+        items:
+          $ref: '#/definitions/NegotiatedRateContract'
+        type: array
+      id:
+        type: integer
+      ownerID:
+        description: ID do proprietário (Agency, neste caso)
+        type: integer
+      ownerType:
+        type: string
+      refGroup:
+        $ref: '#/definitions/RefGroup'
+      refGroupID:
+        type: integer
+      updatedAt:
+        type: string
+      validationStatus:
+        type: string
+    type: object
+  Hotel:
+    properties:
+      AccountHolderId:
+        type: string
+      Address:
+        items:
+          $ref: '#/definitions/Address'
+        type: array
+      AdyenFee:
+        type: number
+      AirportDistanceKm:
+        type: integer
+      BalanceAccountId:
+        type: string
+      BusinessLineId:
+        type: string
+      CompanyStatus:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_entity.CompanyStatus'
+      Country:
+        type: string
+      CountryCode:
+        type: string
+      CreditCards:
+        items:
+          $ref: '#/definitions/CreditCard'
+        type: array
+      CrsOrCm:
+        type: string
+      Currency:
+        type: string
+      HasPaymentMethod:
+        type: boolean
+      Hide:
+        type: string
+      HotelPartner:
+        $ref: '#/definitions/HotelPartner'
+      HotelUser:
+        items:
+          $ref: '#/definitions/HotelUser'
+        type: array
+      IntegrationField:
+        type: string
+      IntegrationId:
+        type: string
+      IntegrationTable:
+        type: string
+      LegalEntityId:
+        type: string
+      LegalEntityName:
+        type: string
+      LegalRepresentativeId:
+        type: string
+      ListAffiliations:
+        type: string
+      ListConsortias:
+        type: string
+      ListLoyaltyPrograms:
+        type: string
+      ListPreferredPrograms:
+        type: string
+      ListSalesReps:
+        type: string
+      NearestAirportCode:
+        type: string
+      NumberOfRooms:
+        type: integer
+      OnboardingErrors:
+        type: string
+      Orders:
+        items:
+          $ref: '#/definitions/Order'
+        type: array
+      OrganizationType:
+        type: string
+      PrimaryLogo:
+        type: string
+      PublicEmail:
+        type: string
+      PublicName:
+        type: string
+      PublicPhone:
+        type: string
+      StoreId:
+        type: string
+      StoreReference:
+        type: string
+      SweepId:
+        type: string
+      TaxId:
+        type: string
+      TaxIdCountry:
+        type: string
+      TaxIdType:
+        type: string
+      TransferInstrumentId:
+        type: string
+      TrvlrEmail:
+        type: string
+      TrvlrPhone:
+        type: string
+      WebSite:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      groups:
+        items:
+          $ref: '#/definitions/Group'
+        type: array
+      id:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  HotelPartner:
+    properties:
+      Active:
+        type: boolean
+      ApiKey:
+        type: string
+      BackgroundColor:
+        type: string
+      Domain:
+        type: string
+      HotelID:
+        type: integer
+      Logo:
+        type: string
+      Name:
+        type: string
+      PrimaryColor:
+        type: string
+      SecondaryColor:
+        type: string
+      TextColor:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  HotelUser:
+    properties:
+      AccessLevel:
+        type: string
+      FirebaseUser:
+        $ref: '#/definitions/FirebaseUser'
+      Hotel:
+        $ref: '#/definitions/Hotel'
+      HotelID:
+        type: integer
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  NegotiatedRateContract:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      groupID:
+        type: integer
+      id:
+        type: integer
+      nrc:
+        $ref: '#/definitions/DhiscoNRC'
+      nrcID:
+        description: Group         Group `gorm:"foreignKey:GroupID;constraint:OnDelete:SET
+          NULL"`
+        type: integer
+      updatedAt:
+        type: string
+    type: object
   Order:
-    type: "object"
     properties:
+      AgencyCommission:
+        type: integer
+      AgencyUser:
+        $ref: '#/definitions/AgencyUser'
+      AgencyUserID:
+        type: integer
+      BookingStatus:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_entity.BookingStatusEnum'
+      CheckIn:
+        type: string
+      CheckOut:
+        type: string
+      CreditCard:
+        $ref: '#/definitions/CreditCard'
+      CreditCardID:
+        type: integer
+      Currency:
+        type: string
+      DenyMotive:
+        type: string
+      Hotel:
+        $ref: '#/definitions/Hotel'
+      HotelID:
+        type: integer
+      HotelMasterMultiplesId:
+        type: integer
+      IntegrationOrderField:
+        type: string
+      IntegrationOrderTable:
+        type: string
+      InvoiceTaHtl:
+        type: string
+      InvoiceTrvlrHtl:
+        type: string
+      IvoiceTrvlrTa:
+        type: string
+      LoyaltyProgram:
+        type: string
+      LoyaltyProgramAcc:
+        type: string
+      Notes:
+        type: string
+      OrderErrors:
+        type: string
+      OrderItems:
+        items:
+          $ref: '#/definitions/OrderItem'
+        type: array
+      PartnerCode:
+        type: string
+      PaxName:
+        type: string
+      PspReference:
+        type: string
+      ReservationNumber:
+        type: string
+      SpecialRequests:
+        type: string
+      Traveler:
+        $ref: '#/definitions/Traveler'
+      TravelerID:
+        type: integer
+      TzIdentifier:
+        type: string
+      VervotechSourceProvider:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
       id:
-        type: "integer"
-        format: "int64"
-      petId:
-        type: "integer"
-        format: "int64"
-      quantity:
-        type: "integer"
-        format: "int32"
-      shipDate:
-        type: "string"
-        format: "date-time"
-      status:
-        type: "string"
-        description: "Order Status"
-        enum:
-        - "placed"
-        - "approved"
-        - "delivered"
-      complete:
-        type: "boolean"
-    xml:
-      name: "Order"
-  User:
-    type: "object"
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  OrderItem:
     properties:
+      Adults:
+        type: integer
+      CheckIn:
+        type: string
+      CheckOut:
+        type: string
+      Children:
+        type: integer
+      ChildrenAgesString:
+        type: string
+      Currency:
+        type: string
+      Fees:
+        type: number
+      OrderReference:
+        type: integer
+      Price:
+        type: number
+      PriceNet:
+        type: number
+      PriceSell:
+        type: number
+      RoomPrice:
+        type: number
+      Type:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
       id:
-        type: "integer"
-        format: "int64"
-      username:
-        type: "string"
-      firstName:
-        type: "string"
-      lastName:
-        type: "string"
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  RefGroup:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      groupName:
+        type: string
+      groupType:
+        type: string
+      groups:
+        items:
+          $ref: '#/definitions/Group'
+        type: array
+      id:
+        type: integer
+      logo:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  Traveler:
+    properties:
+      AgencyUser:
+        $ref: '#/definitions/AgencyUser'
+      AgencyUserID:
+        type: integer
+      CreditCards:
+        items:
+          $ref: '#/definitions/CreditCard'
+        type: array
+      FirebaseUser:
+        $ref: '#/definitions/FirebaseUser'
+      HasPaymentMethod:
+        type: boolean
+      ID:
+        type: integer
+      Orders:
+        items:
+          $ref: '#/definitions/Order'
+        type: array
+      TrvlrId:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  Verificator:
+    properties:
+      CompanyStatus:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_entity.CompanyStatus'
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      hide:
+        type: boolean
+      id:
+        type: integer
+      updatedAt:
+        type: string
+      verificatorUser:
+        items:
+          $ref: '#/definitions/VerificatorUser'
+        type: array
+    type: object
+  VerificatorUser:
+    properties:
+      FirebaseUser:
+        $ref: '#/definitions/FirebaseUser'
+      accessLevel:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
       email:
-        type: "string"
-      password:
-        type: "string"
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      refGroup:
+        $ref: '#/definitions/RefGroup'
+      refGroupID:
+        type: integer
+      updatedAt:
+        type: string
+      verificator:
+        $ref: '#/definitions/Verificator'
+      verificatorID:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_adyen.HostedOnboardingResponse:
+    properties:
+      url:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_bonotel.TokenSession:
+    properties:
+      expires:
+        type: string
+      token:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.AgencyAddressDetailsBookingResponse:
+    properties:
+      country:
+        type: string
+      stateOrProvince:
+        type: string
+      street:
+        type: string
+      street2:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.AgencyDetailsBookingResponse:
+    properties:
+      accreditationNumber:
+        type: string
+      accreditationOrganization:
+        type: string
+      address:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.AgencyAddressDetailsBookingResponse'
+      advisorEmail:
+        type: string
+      advisorName:
+        type: string
+      advisorPhoneNumber:
+        type: string
+      agencyName:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.AgencyUpdateRequestDTO:
+    properties:
+      HostAgency:
+        type: string
+      ListConsortias:
+        type: string
+      ListPreferredPrograms:
+        type: string
+      PrimaryEmail:
+        type: string
+      PrimaryLogoLink:
+        type: string
+      PrimaryPhone:
+        type: string
+      Programs:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.Programs'
+      PublicName:
+        type: string
+      ReservationEmail:
+        type: string
+      ReservationPhone:
+        type: string
+      TrvlrEmail:
+        type: string
+      TrvlrPhone:
+        type: string
+      id:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.ApiPositionResponse:
+    properties:
+      latitude:
+        type: number
+      longitude:
+        type: number
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.BoardDescriptionEnum:
+    enum:
+    - ROOM_ONLY
+    - BED_AND_BREAKFAST
+    - 'HALF_BOARD '
+    - FULL_BOARD
+    - ALL_INCLUSIVE
+    type: string
+    x-enum-varnames:
+    - BoardDescriptionEnum_RO
+    - BoardDescriptionEnum_BB
+    - BoardDescriptionEnum_HB
+    - BoardDescriptionEnum_FB
+    - BoardDescriptionEnum_AI
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.BoardEnumDTO:
+    enum:
+    - RO
+    - BB
+    - HB
+    - FB
+    - AI
+    type: string
+    x-enum-varnames:
+    - BoardEnumDTO_ROOM_ONLY
+    - BoardEnumDTO_BED_AND_BREAKFAST
+    - BoardEnumDTO_HALF_BOARD
+    - BoardEnumDTO_FULL_BOARD
+    - BoardEnumDTO_ALL_INCLUSIVE
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.BoardResponse:
+    properties:
+      boardDescription:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.BoardDescriptionEnum'
+      boardType:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.BoardEnumDTO'
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.CreateClientRequestDTO:
+    properties:
+      address:
+        type: string
+      agencyUserId:
+        type: integer
+      birthDate:
+        type: string
+      city:
+        type: string
+      countryCode:
+        type: string
+      countryName:
+        type: string
+      email:
+        type: string
+      fullname:
+        type: string
       phone:
-        type: "string"
-      userStatus:
-        type: "integer"
-        format: "int32"
-        description: "User Status"
-    xml:
-      name: "User"
-externalDocs:
-  description: "Find out more about Swagger"
-  url: "http://swagger.io"
+        type: string
+      postalCode:
+        type: string
+      publicName:
+        type: string
+      stateOrProvince:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.CreateCreditCardRequestDTO:
+    properties:
+      cardHolderName:
+        type: string
+      encryptedCardNumber:
+        type: string
+      encryptedExpiryMonth:
+        type: string
+      encryptedExpiryYear:
+        type: string
+      encryptedSecurityCode:
+        type: string
+      id:
+        type: integer
+      userType:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_entity.AccountOwnerType'
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.CreateReferredAccountRequestDTO:
+    properties:
+      signupMode:
+        allOf:
+        - $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SING_UP_MODE'
+        description: 1 = agency_users, 2 = hotel_users
+      superID:
+        type: integer
+      uid:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetAgencyUserTravelersByAgencyIdResponseDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/Traveler'
+        type: array
+      lastPage:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetAgentsByAgencyResponseDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/AgencyUser'
+        type: array
+      lastPage:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetCommissionsAndHotelsResponseDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/CustomCommission'
+        type: array
+      last_Page:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelUsersResponseDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/HotelUser'
+        type: array
+      last_Page:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdBedConfigurationResponse:
+    properties:
+      quantity:
+        type: integer
+      size:
+        type: string
+      type:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdBoardEnum:
+    enum:
+    - RO
+    - BB
+    - HB
+    - FB
+    - AI
+    type: string
+    x-enum-varnames:
+    - ApiBoardEnum_ROOM_ONLY
+    - ApiBoardEnum_BED_AND_BREAKFAST
+    - ApiBoardEnum_HALF_BOARD
+    - ApiBoardEnum_FULL_BOARD
+    - ApiBoardEnum_ALL_INCLUSIVE
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdBoardResponse:
+    properties:
+      boardDescription:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.BoardDescriptionEnum'
+      boardType:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdBoardEnum'
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdCancellationPoliciesResponse:
+    properties:
+      amount:
+        type: integer
+      daysBefore:
+        type: integer
+      penaltyType:
+        type: string
+      timeSettings:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdTimeSettingsReponse'
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdCategoryResponse:
+    properties:
+      Code:
+        type: integer
+      Description:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdFacilityHotelResponse:
+    properties:
+      category:
+        type: string
+      classification:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdFacilityRoomsResponse:
+    properties:
+      category:
+        type: string
+      classification:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdFeesResponse:
+    properties:
+      amount:
+        type: number
+      currency:
+        type: string
+      description:
+        type: string
+      relation:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdPositionResponse:
+    properties:
+      Latitude:
+        type: number
+      Longitude:
+        type: number
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdPriceResponse:
+    properties:
+      amountAfterTax:
+        type: number
+      currencyCode:
+        type: string
+      fees:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdFeesResponse'
+        type: array
+      taxes:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdTaxesResponse'
+        type: array
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdRatePlanResponse:
+    properties:
+      agencyCommission:
+        type: number
+      availableByProfit:
+        type: boolean
+      board:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdBoardResponse'
+      bookingExtraInfo:
+        additionalProperties:
+          type: string
+        type: object
+      cancellationPolicies:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdCancellationPoliciesResponse'
+        type: array
+      extraProviderData: {}
+      numberOfAvaialbeRooms:
+        type: integer
+      price:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdPriceResponse'
+      ratePlanCode:
+        type: string
+      ratePlanDescription:
+        type: string
+      ratePlanId:
+        type: integer
+      ratePlanName:
+        type: string
+      refundable:
+        type: boolean
+      remarks:
+        items:
+          type: string
+        type: array
+      roomCode:
+        type: string
+      roomId:
+        type: integer
+      roomIdStr:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdResponseDTO:
+    properties:
+      category:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdCategoryResponse'
+      checkIn:
+        type: string
+      checkOut:
+        type: string
+      city:
+        type: string
+      commission:
+        type: integer
+      facilitiesRoom:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdFacilityHotelResponse'
+        type: array
+      groups:
+        items:
+          $ref: '#/definitions/Group'
+        type: array
+      hotelAddress:
+        type: string
+      hotelDescription:
+        items:
+          type: string
+        type: array
+      hotelID:
+        type: string
+      hotelImages:
+        items:
+          type: string
+        type: array
+      hotelLogo:
+        type: string
+      hotelName:
+        type: string
+      hotelPaymentPolicy:
+        type: string
+      hotelPhone:
+        type: string
+      hotelProvider:
+        type: string
+      hotelType:
+        type: string
+      hotelUUID:
+        type: integer
+      inventoryProvider:
+        type: string
+      isDirect:
+        type: boolean
+      maxChildAge:
+        type: integer
+      maxInfantAge:
+        type: integer
+      merchantOfRecord:
+        type: string
+      numbersOfRooms:
+        type: integer
+      position:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdPositionResponse'
+      rooms:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdRoomResponse'
+        type: array
+      trvlrHotelId:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdRoomResponse:
+    properties:
+      description:
+        items:
+          type: string
+        type: array
+      facilities:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdFacilityRoomsResponse'
+        type: array
+      hotelLogo:
+        type: string
+      images:
+        items:
+          type: string
+        type: array
+      numberOfAvaialbeRooms:
+        type: integer
+      ratePlans:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdRatePlanResponse'
+        type: array
+      refundable:
+        type: boolean
+      roomId:
+        type: integer
+      roomName:
+        type: string
+      roomSettings:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdRoomSettings'
+      roomType:
+        type: string
+      searchedPax:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdSearchedPaxresponse'
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdRoomSettings:
+    properties:
+      beddingSettings:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdBedConfigurationResponse'
+        type: array
+      maxAdultsNumber:
+        type: integer
+      maxChildrenNumber:
+        type: integer
+      maxInfantsNumber:
+        type: integer
+      maxOccupancy:
+        type: integer
+      numberOfBedrooms:
+        type: integer
+      numberOfBeds:
+        type: integer
+      roomSize:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdSearchedPaxresponse:
+    properties:
+      ageChildren:
+        items:
+          type: integer
+        type: array
+      numberAdults:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdTaxesResponse:
+    properties:
+      amount:
+        type: number
+      currency:
+        type: string
+      description:
+        type: string
+      relation:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdTimeSettingsReponse:
+    properties:
+      timeFromCheckin:
+        type: integer
+      timeFromCheckinType:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetOrderInfoResponse:
+    properties:
+      accreditationNumber:
+        type: string
+      accretitationName:
+        type: string
+      agencyAddress:
+        type: string
+      agencyName:
+        type: string
+      agencyPayout:
+        type: number
+      agentName:
+        type: string
+      cancellationPolicies:
+        items:
+          $ref: '#/definitions/ApCancellationPolicies'
+        type: array
+      commission:
+        type: integer
+      commissionValue:
+        type: number
+      hotelAddress:
+        type: string
+      hotelName:
+        type: string
+      hotelPayout:
+        type: number
+      netProcessing:
+        type: number
+      order:
+        $ref: '#/definitions/Order'
+      paymentPolicyString:
+        type: string
+      trvlrfees:
+        type: number
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetOrdersByAgency:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/Order'
+        type: array
+      disputedCount:
+        type: integer
+      lastPage:
+        type: integer
+      outstandingCurrencyValue:
+        type: number
+      page:
+        type: integer
+      paidCount:
+        type: integer
+      pastDueCurrencyValue:
+        type: number
+      total:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetOrdersByAgencyUser:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/Order'
+        type: array
+      disputedCount:
+        type: integer
+      lastPage:
+        type: integer
+      outstandingCurrencyValue:
+        type: number
+      page:
+        type: integer
+      paidCount:
+        type: integer
+      pastDueCurrencyValue:
+        type: number
+      total:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetOrdersByHotelIDResponseDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/Order'
+        type: array
+      disputedCount:
+        type: integer
+      lastPage:
+        type: integer
+      outstandingCurrencyValue:
+        type: number
+      page:
+        type: integer
+      paidCount:
+        type: integer
+      pastDueCurrencyValue:
+        type: number
+      total:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetPublicKeyResponseDTO:
+    properties:
+      publicKey:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetReportsCSVResponseDTO:
+    properties:
+      agency:
+        type: string
+      agencyID:
+        type: string
+      agencyName:
+        type: string
+      agencyUser:
+        type: string
+      agencyUserID:
+        type: string
+      id:
+        type: string
+      reservationNumber:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GuaranteePolicy:
+    properties:
+      depositPolicy:
+        type: string
+      guaranteePolicy:
+        type: string
+      prePayPolicy:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GuestData:
+    properties:
+      adults:
+        type: integer
+      ages:
+        items:
+          type: integer
+        type: array
+      checkin:
+        type: string
+      checkout:
+        type: string
+      children:
+        type: integer
+      hotel:
+        type: string
+      hotelId:
+        type: string
+      pets:
+        type: boolean
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GuestInformation:
+    properties:
+      adults:
+        type: integer
+      ages:
+        items:
+          type: integer
+        type: array
+      children:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.HostedOnboardingRequestDTO:
+    properties:
+      country:
+        type: string
+      id:
+        type: integer
+      legalName:
+        type: string
+      reservationEmail:
+        type: string
+      reservationPhone:
+        type: string
+      type:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.HotelProgramsResponse:
+    properties:
+      affiliations:
+        type: string
+      consortias:
+        type: string
+      preferred:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.HotelUpdateRequestDTO:
+    properties:
+      PrimaryEmail:
+        type: string
+      PrimaryPhone:
+        type: string
+      PublicName:
+        type: string
+      airportDistanceKm:
+        type: integer
+      hotelID:
+        type: integer
+      id:
+        type: integer
+      listSalesReps:
+        type: string
+      nearestAirportCode:
+        type: string
+      programs:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.Programs'
+      reservationEmail:
+        type: string
+      reservationPhone:
+        type: string
+      trvlrEmail:
+        type: string
+      trvlrPhone:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.IdentifierParamMappingsDTO:
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.OnboardingEmailRequestDTO:
+    properties:
+      accreditationNumber:
+        type: string
+      accreditationOrganization:
+        type: string
+      birthDate:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      countryCode:
+        type: string
+      firebaseUid:
+        type: string
+      guestData:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GuestData'
+      phoneNumber:
+        type: string
+      postalCode:
+        type: string
+      publicName:
+        type: string
+      stateOrProvince:
+        type: string
+      streetAddress:
+        type: string
+      userEmail:
+        type: string
+      userName:
+        type: string
+      userType:
+        allOf:
+        - $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SingupMode'
+        description: 1 = agency, 2 = Hotel
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.OnboardingUpdateUserRequestDTO:
+    properties:
+      accreditationNumber:
+        type: string
+      accreditationOrganization:
+        type: string
+      birthDate:
+        type: string
+      city:
+        type: string
+      countryCode:
+        type: string
+      countryName:
+        type: string
+      crsOrCm:
+        type: string
+      currency:
+        maxLength: 3
+        minLength: 3
+        type: string
+      firebaseUid:
+        type: string
+      numberOfRooms:
+        type: integer
+      postalCode:
+        type: string
+      profilePictureLink:
+        type: string
+      publicEmail:
+        type: string
+      publicName:
+        type: string
+      publicPhoneNumber:
+        type: string
+      stateOrProvince:
+        type: string
+      streetAddress:
+        type: string
+      trvlrEmail:
+        type: string
+      trvlrPhoneNumber:
+        type: string
+      userType:
+        allOf:
+        - $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_entity.AccountOwnerType'
+        description: agency_users, hotel_users, travelers
+      webSite:
+        type: string
+    required:
+    - city
+    - countryCode
+    - countryName
+    - currency
+    - firebaseUid
+    - postalCode
+    - publicEmail
+    - publicName
+    - streetAddress
+    - trvlrPhoneNumber
+    - userType
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.OnboardingUpdateUserResponseDTO:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.OrderInformationBookingResponse:
+    properties:
+      adults:
+        type: integer
+      avarageDailyRate:
+        type: string
+      childrenAgesString:
+        type: string
+      childrenAmount:
+        type: integer
+      currency:
+        type: string
+      endDate:
+        type: string
+      fees:
+        type: string
+      guestsAmount:
+        type: integer
+      hotelReservationEmail:
+        type: string
+      paymentPolicy:
+        type: string
+      policies:
+        type: string
+      propertyAddress:
+        type: string
+      propertyName:
+        type: string
+      rateCode:
+        type: string
+      rateDescription:
+        type: string
+      reservationNumber:
+        type: string
+      reservationStatus:
+        type: string
+      roomQuantity:
+        type: integer
+      roomTypeName:
+        type: string
+      startDate:
+        type: string
+      taxes:
+        type: string
+      totalAmount:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.PaxDetailsBookingResponse:
+    properties:
+      address:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      email:
+        type: string
+      loyaltyProgram:
+        type: string
+      mobilePhoneNumber:
+        type: string
+      paxFirstName:
+        type: string
+      paxLastName:
+        type: string
+      phoneNumber:
+        type: string
+      requests:
+        type: string
+      specialRequests:
+        type: string
+      state:
+        type: string
+      zipCode:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.PayOrderRequestDTO:
+    properties:
+      orderIds:
+        items:
+          type: integer
+        type: array
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.PaymentDetailsBookingResponse:
+    properties:
+      comission:
+        type: string
+      comissionPct:
+        type: string
+      currency:
+        type: string
+      estimetedComissionPayout:
+        type: string
+      grandTotal:
+        type: string
+      netComission:
+        type: string
+      others:
+        type: string
+      rooms:
+        type: string
+      trvlrFees:
+        type: string
+      trvlrFeesPct:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.Programs:
+    properties:
+      affiliations:
+        items:
+          $ref: '#/definitions/RefGroup'
+        type: array
+      consortias:
+        items:
+          $ref: '#/definitions/RefGroup'
+        type: array
+      hostAgencies:
+        items:
+          $ref: '#/definitions/RefGroup'
+        type: array
+      loyalties:
+        items:
+          $ref: '#/definitions/RefGroup'
+        type: array
+      preferredPartnerPrograms:
+        items:
+          $ref: '#/definitions/RefGroup'
+        type: array
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.RequestBulkCreateReferredAccountDto:
+    properties:
+      agencyId:
+        type: integer
+      password:
+        minLength: 8
+        type: string
+      user:
+        items:
+          properties:
+            email:
+              type: string
+            name:
+              type: string
+          required:
+          - email
+          - name
+          type: object
+        type: array
+    required:
+    - agencyId
+    - password
+    - user
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SING_UP_MODE:
+    enum:
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - AGENT_USER
+    - HOTELIER_USER
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SearchResponseDTO:
+    properties:
+      cities:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SearchResultCityDTO'
+        type: array
+      country:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SearchResultCountryDTO'
+        type: array
+      hotels:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SearchResultHotelDTO'
+        type: array
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SearchResultCityDTO:
+    properties:
+      Country:
+        type: string
+      amount:
+        type: integer
+      city:
+        type: string
+      cityid:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SearchResultCountryDTO:
+    properties:
+      country:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SearchResultHotelDTO:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SendReferralLinkBodyRequestDTO:
+    properties:
+      companyName:
+        type: string
+      country:
+        type: string
+      inviterName:
+        type: string
+      superID:
+        type: integer
+      targetMail:
+        type: string
+      targetName:
+        type: string
+      userType:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SendVerificationEmailRequestDTO:
+    properties:
+      adults:
+        type: integer
+      ages:
+        items:
+          type: string
+        type: array
+      checkin:
+        type: string
+      checkout:
+        type: string
+      children:
+        type: integer
+      domain:
+        type: string
+      hotel:
+        type: string
+      hotelID:
+        type: string
+      partnerCode:
+        type: string
+      pets:
+        type: boolean
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SendVerificationEmailResponseDTO:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SingupMode:
+    enum:
+    - 1
+    - 2
+    - 3
+    type: integer
+    x-enum-varnames:
+    - SingupMode_AGENCY_MODE
+    - SingupMode_HOTEL_MODE
+    - SingupMode_TRAVELER
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.Traveler:
+    properties:
+      AgencyUser:
+        $ref: '#/definitions/AgencyUser'
+      AgencyUserID:
+        type: integer
+      CreditCards:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TravelersCreditCardResponseDTO'
+        type: array
+      FirebaseUser:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TravelersFirebaseUserResponseDTO'
+      HasPaymentMethod:
+        type: boolean
+      ID:
+        type: integer
+      Orders:
+        items:
+          $ref: '#/definitions/Order'
+        type: array
+      ShopperReference:
+        type: string
+      TrvlrId:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TravelersCreditCardResponseDTO:
+    properties:
+      CardBrand:
+        description: '"amex", "cup", "diners", "discover", "mc", "visa"'
+        type: string
+      ExpiracyDate:
+        type: string
+      ID:
+        type: integer
+      IsDefault:
+        type: boolean
+      Last4Digits:
+        type: string
+      LastTimeUsed:
+        type: string
+      TravelerID:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TravelersFirebaseUserResponseDTO:
+    properties:
+      AccountOwnerID:
+        type: integer
+      AccountOwnerType:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_entity.AccountOwnerType'
+      Address:
+        type: string
+      City:
+        type: string
+      Country:
+        type: string
+      DateOfBirth:
+        type: string
+      Email:
+        type: string
+      Fullname:
+        type: string
+      ID:
+        type: integer
+      NamePrefix:
+        type: string
+      Phone:
+        type: string
+      PostalCode:
+        type: string
+      ProfilePhoto:
+        type: string
+      PublicName:
+        type: string
+      StateOrProvince:
+        type: string
+      Status:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_entity.FbUserStatus'
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvleAgencyManageProfileResponseDto:
+    properties:
+      account_owner_id:
+        type: integer
+      account_owner_type:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_entity.AccountOwnerType'
+      address:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      date_of_birth:
+        type: string
+      email:
+        type: string
+      firebase_uid:
+        type: string
+      fullname:
+        type: string
+      name_prefix:
+        type: string
+      phone:
+        type: string
+      postal_code:
+        type: string
+      profile_photo:
+        type: string
+      public_name:
+        type: string
+      role:
+        type: string
+      state_or_province:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvleHotelManageProfileResponseDto:
+    properties:
+      account_owner_id:
+        type: integer
+      account_owner_type:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_entity.AccountOwnerType'
+      address:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      date_of_birth:
+        type: string
+      email:
+        type: string
+      firebase_uid:
+        type: string
+      fullname:
+        type: string
+      name_prefix:
+        type: string
+      phone:
+        type: string
+      postal_code:
+        type: string
+      profile_photo:
+        type: string
+      public_name:
+        type: string
+      role:
+        type: string
+      state_or_province:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrAgencyInvoiceResponse:
+    properties:
+      fileName:
+        type: string
+      invoiceTaHtl:
+        type: string
+      invoiceTrvlrTa:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrAgencyPayoutsReponse:
+    properties:
+      Data:
+        items:
+          $ref: '#/definitions/AgencyCommissionPayout'
+        type: array
+      LastPage:
+        type: integer
+      Page:
+        type: integer
+      Total:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrAgencyResponseDto:
+    properties:
+      accreditationNumber:
+        type: string
+      accreditationOrganization:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      hostName:
+        type: string
+      listConsortias:
+        type: string
+      listPreferredPrograms:
+        type: string
+      postalCode:
+        type: string
+      primaryEmail:
+        type: string
+      primaryPhone:
+        type: string
+      primarylogourl:
+        type: string
+      state:
+        type: string
+      street1:
+        type: string
+      street2:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrBookingCancelationRequestDTO:
+    properties:
+      orderId:
+        type: integer
+      reason:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrBookingHotelInfomationDTO:
+    properties:
+      dates:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrDateRangeDTO'
+      guestsAgeConfiguration:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrguestsAgesDto'
+        type: array
+      hotelID:
+        type: integer
+      propertyAddress:
+        type: string
+      propertyName:
+        type: string
+      reference:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrReferenceDTO'
+      rooms:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrRoomDTO'
+        type: array
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrCancellationPolicyDto:
+    properties:
+      amount:
+        type: number
+      daysBefore:
+        type: integer
+      description:
+        type: string
+      penaltyType:
+        type: string
+      timeSettings:
+        properties:
+          timeFromCheckin:
+            type: integer
+          timeFromCheckinType:
+            type: string
+        type: object
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrCard:
+    properties:
+      CardBrand:
+        type: string
+      ExpiracyDate:
+        type: string
+      ID:
+        type: integer
+      IsDefault:
+        type: boolean
+      Last4Digits:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrCreateBookingDTO:
+    properties:
+      adults:
+        type: integer
+      agencyCommission:
+        type: number
+      agencyUsrId:
+        type: integer
+      children:
+        type: integer
+      childrenAgesString:
+        type: string
+      extraProviderData:
+        type: string
+      hotelInformation:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrBookingHotelInfomationDTO'
+      hotelPartnerLogo:
+        type: string
+      isHotelPartner:
+        type: boolean
+      loyaltyAccount:
+        type: string
+      loyaltyName:
+        type: string
+      partnerCode:
+        type: string
+      reservantionNotes:
+        type: string
+      roomTotal:
+        type: number
+      specialRequests:
+        type: string
+      trvlrId:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrCreateBookingResponseDTO:
+    properties:
+      agencyDetails:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.AgencyDetailsBookingResponse'
+      orderInfomation:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.OrderInformationBookingResponse'
+      paxDetails:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.PaxDetailsBookingResponse'
+      paymentDetails:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.PaymentDetailsBookingResponse'
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrDateRangeDTO:
+    properties:
+      from:
+        type: string
+      to:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrExpectedPriceDTO:
+    properties:
+      amount:
+        description: RoomAmount decimal.Decimal `json:"roomAmount"`
+        type: number
+      currency:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrGenereateAllInvoiceResponse:
+    properties:
+      invoiceTaHtl:
+        type: string
+      invoiceTrvlrHtl:
+        type: string
+      invoiceTrvlrTa:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrGetCardsResponse:
+    properties:
+      cards:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrCard'
+        type: array
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrGetCountriesResponse:
+    properties:
+      countries:
+        items:
+          $ref: '#/definitions/Country'
+        type: array
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrGetPartnerConfigResponse:
+    properties:
+      HmmID:
+        type: integer
+      Partner:
+        $ref: '#/definitions/HotelPartner'
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrHotelInvoiceResponse:
+    properties:
+      fileName:
+        type: string
+      invoiceTaHtl:
+        type: string
+      invoiceTrvlrHtl:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrHotelResponseDto:
+    properties:
+      PublicName:
+        type: string
+      airportDistanceKm:
+        type: integer
+      city:
+        type: string
+      country:
+        type: string
+      frontDeskEmail:
+        type: string
+      frontDeskPhone:
+        type: string
+      listAffiliations:
+        type: string
+      listConsortias:
+        type: string
+      listLoyaltyPrograms:
+        type: string
+      listPreferredPrograms:
+        type: string
+      listSalesReps:
+        type: string
+      nearestAirportCode:
+        type: string
+      postalCode:
+        type: string
+      primarylogourl:
+        type: string
+      reservationEmail:
+        type: string
+      reservationPhone:
+        type: string
+      state:
+        type: string
+      street1:
+        type: string
+      street2:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrModifyBookingDTO:
+    properties:
+      adults:
+        type: integer
+      agencyCommission:
+        type: number
+      agencyUsrId:
+        type: integer
+      children:
+        type: integer
+      childrenAgesString:
+        type: string
+      hotelInformation:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrBookingHotelInfomationDTO'
+      orderId:
+        type: integer
+      reservantionNotes:
+        type: string
+      specialRequests:
+        type: string
+      trvlrId:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrModifyBookingResponseDTO:
+    properties:
+      agencyDetails:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.AgencyDetailsBookingResponse'
+      orderInfomation:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.OrderInformationBookingResponse'
+      paxDetails:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.PaxDetailsBookingResponse'
+      paymentDetails:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.PaymentDetailsBookingResponse'
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrRateRulesRequest:
+    properties:
+      adults:
+        type: integer
+      checkIn:
+        type: string
+      childNumber:
+        type: integer
+      hotelUUID:
+        type: integer
+      nights:
+        type: integer
+      ratePlan:
+        properties:
+          RatePlanCode:
+            type: string
+          RoomIdStr:
+            type: string
+        type: object
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrRateRulesResponse:
+    properties:
+      adults:
+        type: integer
+      cancellationPolicy:
+        type: string
+      checkIn:
+        type: string
+      childNumber:
+        type: integer
+      depositPolicy:
+        type: string
+      guaranteePolicy:
+        type: string
+      hotelUUID:
+        type: integer
+      nights:
+        type: integer
+      prePayPolicy:
+        type: string
+      ratePlan:
+        properties:
+          RatePlanCode:
+            type: string
+          RoomIdStr:
+            type: string
+        type: object
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrReferenceDTO:
+    properties:
+      agency:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrRoomDTO:
+    properties:
+      bookingExtraInfo:
+        additionalProperties:
+          type: string
+        type: object
+      cancellationPolicies:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrCancellationPolicyDto'
+        type: array
+      expectedPrice:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrExpectedPriceDTO'
+      guaranteePolicy:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GuaranteePolicy'
+      ratePlanCode:
+        type: string
+      ratePlanId:
+        type: integer
+      roomCode:
+        description: used with RoomID (responsible to identify but RoomCode is string
+          and some suppliers use chars in the identifier)
+        type: string
+      roomId:
+        type: integer
+      roomName:
+        type: string
+      roomType:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrSearchDestinarionResponseDTO:
+    properties:
+      board:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.BoardResponse'
+      cheapestPrice:
+        type: number
+      city:
+        type: string
+      commission:
+        type: integer
+      country:
+        type: string
+      currency:
+        type: string
+      groups:
+        items:
+          $ref: '#/definitions/Group'
+        type: array
+      hotelID:
+        type: integer
+      hotelLogo:
+        type: string
+      hotelName:
+        type: string
+      hotelPrograms:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.HotelProgramsResponse'
+      merchant:
+        type: string
+      numbersOfAvailableRooms:
+        type: integer
+      numbersOfRooms:
+        type: integer
+      position:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.ApiPositionResponse'
+        type: array
+      ratePlanCode:
+        type: string
+      refundable:
+        type: boolean
+      starRanking:
+        type: integer
+      thumb:
+        type: string
+      total:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrSearchDestinationRequestDto:
+    properties:
+      accountType:
+        type: string
+      agencyId:
+        type: integer
+      checkInDate:
+        type: string
+      cityID:
+        type: string
+      country:
+        type: string
+      merchant:
+        type: string
+      nights:
+        type: integer
+      page:
+        description: |-
+          Affiliation []string `json:"affiliation"`
+          Consortia   []string `json:"consortia"`
+        type: integer
+      programs:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.Programs'
+      provider:
+        type: string
+      rating:
+        type: integer
+      rooms:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GuestInformation'
+        type: array
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrSearchRequestDto:
+    properties:
+      agencyId:
+        type: integer
+      checkInDate:
+        type: string
+      hotelID:
+        description: represents the hotel id at hotel master multis
+        type: integer
+      nights:
+        type: integer
+      provider:
+        type: string
+      rooms:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GuestInformation'
+        type: array
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrUpdateAgencyLogoReponse:
+    properties:
+      message:
+        type: string
+      pathName:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrUpdateDefaultCard:
+    properties:
+      newCardId:
+        type: integer
+      oldCardId:
+        type: integer
+    required:
+    - newCardId
+    - oldCardId
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrUpsertHotelMasterMultiplesRequest:
+    properties:
+      ids:
+        items:
+          type: integer
+        type: array
+      providerFamily:
+        type: string
+    required:
+    - ids
+    - providerFamily
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrVerifyEmailResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrguestsAgesDto:
+    properties:
+      adults:
+        type: integer
+      ages:
+        items:
+          type: integer
+        type: array
+      children:
+        type: integer
+      childrenBirthDate:
+        items:
+          type: string
+        type: array
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.UpdateCommissionRequestDTO:
+    properties:
+      agencyID:
+        type: integer
+      hotelId:
+        type: integer
+      newCommission:
+        type: integer
+      observation:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto.UpdateTravlerRequestDTO:
+    properties:
+      address:
+        type: string
+      birthDate:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      email:
+        type: string
+      firebaseUID:
+        type: string
+      fullname:
+        type: string
+      phone:
+        type: string
+      postalCode:
+        type: string
+      publicName:
+        type: string
+      stateOrProvince:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto_dhisco.FetchPropertyDTO:
+    properties:
+      dhiscoPropertyID:
+        type: string
+      hotelTrvlrID:
+        type: integer
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_dto_dhisco.ResponseDhiscoHdiDTO:
+    properties:
+      message:
+        type: string
+      name:
+        type: string
+      propertyID:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_entity.AccountOwnerType:
+    enum:
+    - agency_users
+    - hotel_users
+    - travelers
+    type: string
+    x-enum-varnames:
+    - AccountOwnerType_AGENCY_USERS
+    - AccountOwnerType_HOTEL_USERS
+    - AccountOwnerType_TRAVELER
+  github_com_atena-solutions_trvlr-svcmesh_pkg_entity.AgencyCommissionPayoutStatus:
+    enum:
+    - PENDING_CHECKOUT
+    - PAYOUT_SCHEDULED
+    - PAYOUT_PROCESSING
+    - PAYOUT_COMPLETED
+    - PAYOUT_FAILED
+    type: string
+    x-enum-varnames:
+    - AgencyCommissionPayoutStatus_PENDING_CHECKOUT
+    - AgencyCommissionPayoutStatus_PAYOUT_SCHEDULED
+    - AgencyCommissionPayoutStatus_PAYOUT_PROCESSINGED
+    - AgencyCommissionPayoutStatus_PAYOUT_COMPLETED
+    - AgencyCommissionPayoutStatus_PAYOUT_FAILED
+  github_com_atena-solutions_trvlr-svcmesh_pkg_entity.BookingStatusEnum:
+    enum:
+    - BOOKING_UPCOMING
+    - BOOKING_PROCESSING
+    - BOOKING_PAID
+    - BOOKING_PROCESSING_FAILED
+    - BOOKING_DISPUTED
+    - BOOKING_PAST_DUE
+    - BOOKING_OUTSTANDING
+    - BOOKING_CANCELED
+    type: string
+    x-enum-comments:
+      BookingStatusEnum_BOOKING_OUTSTANDING: outstading = 2 days after checkout and
+        paid
+    x-enum-varnames:
+    - BookingStatusEnum_BOOKING_UPCOMING
+    - BookingStatusEnum_BOOKING_PROCESSING
+    - BookingStatusEnum_BOOKING_PAID
+    - BookingStatusEnum_BOOKING_PROCESSING_FAILED
+    - BookingStatusEnum_BOOKING_DISPUTED
+    - BookingStatusEnum_BOOKING_PAST_DUE
+    - BookingStatusEnum_BOOKING_OUTSTANDING
+    - BookingStatusEnum_BOOKING_CANCELED
+  github_com_atena-solutions_trvlr-svcmesh_pkg_entity.CompanyStatus:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    type: integer
+    x-enum-varnames:
+    - CompanyStatus_DISABLED
+    - CompanyStatus_ONBOARDING_PENDING
+    - CompanyStatus_ONBOARDING_STARTED
+    - CompanyStatus_ACTIVE
+  github_com_atena-solutions_trvlr-svcmesh_pkg_entity.FbUserStatus:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    type: integer
+    x-enum-varnames:
+    - FbUserStatus_DISABLED
+    - FbUserStatus_WAITING_EMAIL_VALIDATION
+    - FbUserStatus_WAITING_SIGNUP_MODE
+    - FbUserStatus_WAITING_ONBOARDING
+    - FbUserStatus_ENABLED
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiBarBooking:
+    properties:
+      currency:
+        type: string
+      price:
+        type: number
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiCalculationComments:
+    properties:
+      relation:
+        type: string
+      type:
+        type: string
+      value:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiValueComments'
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiCancellationPolicyBooking:
+    properties:
+      description:
+        type: string
+      endDate:
+        type: string
+      policyId:
+        type: integer
+      price:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiPriceCancellationPolicyBooking'
+      startDate:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiChargeAmounBookingResponse:
+    properties:
+      currency:
+        type: string
+      price:
+        type: number
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiCommissionBooking:
+    properties:
+      currency:
+        type: string
+      price:
+        type: number
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiContactBooking:
+    properties:
+      address:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      email:
+        type: string
+      nationality:
+        type: string
+      phone:
+        type: string
+      state:
+        type: string
+      zip:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiDateBookingresponse:
+    properties:
+      from:
+        type: string
+      to:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiFeesBooking:
+    properties:
+      amount:
+        type: number
+      currency:
+        type: string
+      descripition:
+        type: string
+      relation:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiFinancialModelBooking:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.FinancialModel'
+        type: array
+      keys:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.FinancialModel'
+        type: array
+      model:
+        type: string
+      type:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiLeadGuestBooking:
+    properties:
+      age:
+        type: integer
+      birthDate:
+        type: string
+      contact:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiContactBooking'
+      guestId:
+        type: integer
+      guestIdStr:
+        type: string
+      name:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiNameBooking'
+      specialRequests:
+        type: string
+      title:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiMetabookingResponse:
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiNameBooking:
+    properties:
+      first:
+        type: string
+      last:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiNetPriceBooking:
+    properties:
+      currency:
+        type: string
+      price:
+        type: number
+      taxes:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiTaxBooking'
+        type: array
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiNightlyBreakdownBookingResponse:
+    properties:
+      date:
+        type: string
+      prices:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiPricesBooking'
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiPaymentBookingResponse:
+    properties:
+      chargeAmount:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiChargeAmounBookingResponse'
+      type:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiPriceCancellationPolicyBooking:
+    properties:
+      amount:
+        type: number
+      currency:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiPriceCommentsBooking:
+    properties:
+      amount:
+        type: number
+      currency:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiPricesBooking:
+    properties:
+      bar:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiBarBooking'
+      comission:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiCommissionBooking'
+      fees:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiFeesBooking'
+        type: array
+      net:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiNetPriceBooking'
+      sell:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiSellPriceBooking'
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiReferenceAgency:
+    properties:
+      agency:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiReferenceBooking:
+    properties:
+      property:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiRoomBookinResponse:
+    properties:
+      board:
+        type: string
+      cancellationPolicy:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiCancellationPolicyBooking'
+        type: array
+      financialModel:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiFinancialModelBooking'
+      guests:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiLeadGuestBooking'
+        type: array
+      itemId:
+        type: integer
+      nightlyBreakdown:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiNightlyBreakdownBookingResponse'
+        type: array
+      payment:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiPaymentBookingResponse'
+      prices:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiPricesBooking'
+      propertyId:
+        type: integer
+      rateCode:
+        type: string
+      ratePlanId:
+        type: integer
+      ratePlanIdStr:
+        type: string
+      reference:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiReferenceBooking'
+      remarks:
+        items:
+          type: string
+        type: array
+      roomCode:
+        type: string
+      roomId:
+        type: integer
+      roomIdStr:
+        type: string
+      specialRequests:
+        items:
+          type: string
+        type: array
+      status:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiSellPriceBooking:
+    properties:
+      currency:
+        type: string
+      price:
+        type: number
+      taxes:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiTaxBooking'
+        type: array
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiTaxBooking:
+    properties:
+      amount:
+        type: number
+      currency:
+        type: string
+      description:
+        type: string
+      frequency:
+        type: string
+      relation:
+        type: string
+      scope:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiValueComments:
+    properties:
+      searchCurrency:
+        type: number
+      type:
+        type: string
+      value:
+        type: number
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.Content:
+    properties:
+      bookingId:
+        type: string
+      bookingStr:
+        type: string
+      dates:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiDateBookingresponse'
+      financialModel:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiFinancialModelBooking'
+      leadGuest:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiLeadGuestBooking'
+      meta:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiMetabookingResponse'
+        type: array
+      nightlyBreakdown:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiNightlyBreakdownBookingResponse'
+        type: array
+      payment:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiPaymentBookingResponse'
+      prices:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiPricesBooking'
+      propertyId:
+        type: integer
+      reference:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiReferenceAgency'
+      rooms:
+        items:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiRoomBookinResponse'
+        type: array
+      status:
+        type: string
+      transactions:
+        items:
+          type: string
+        type: array
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.FinancialModel:
+    properties:
+      calculation:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiCalculationComments'
+      description:
+        type: string
+      highlight:
+        type: boolean
+      key:
+        type: string
+      order:
+        type: integer
+      price:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.ApiPriceCommentsBooking'
+      tags:
+        items:
+          type: string
+        type: array
+      value:
+        type: string
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_typings.HgBookingCancelationResponse:
+    properties:
+      content:
+        $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.Content'
+    type: object
+  github_com_atena-solutions_trvlr-svcmesh_pkg_utils.ErrorResponse:
+    properties:
+      error:
+        type: string
+      success:
+        type: boolean
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  pkg_controllers_api.BodyDTO:
+    properties:
+      country:
+        description: UserType   string `json:"userType"` // I know that is verificator
+          so this field is not necessary
+        type: string
+      email:
+        type: string
+      name:
+        description: a simple name to be registered at firebase user. Probably will
+          not be used
+        type: string
+      password:
+        type: string
+      refGroupID:
+        description: '[refact] we should not use primary key here, but a UID or something
+          similar'
+        type: integer
+    type: object
+  pkg_controllers_api.ContactMessage:
+    properties:
+      company:
+        type: string
+      email:
+        type: string
+      employees:
+        type: string
+      firstName:
+        type: string
+      jobTitle:
+        type: string
+      phone:
+        type: string
+      secondName:
+        type: string
+      selectedCountry:
+        type: string
+      title:
+        type: string
+      userId:
+        type: string
+    type: object
+  pkg_controllers_api.CreateCommissionParams:
+    properties:
+      advisorEmail:
+        type: string
+      commission:
+        type: integer
+      hotelId:
+        type: integer
+    type: object
+  pkg_controllers_api.GetOrdersByTravelerIDResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/Order'
+        type: array
+      last_Page:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  pkg_controllers_api.ObjectContainerAgency:
+    properties:
+      consortias:
+        items:
+          $ref: '#/definitions/pkg_controllers_api.typeList'
+        type: array
+      host_agency:
+        items:
+          $ref: '#/definitions/pkg_controllers_api.typeList'
+        type: array
+      partner_programs:
+        items:
+          $ref: '#/definitions/pkg_controllers_api.typeList'
+        type: array
+    type: object
+  pkg_controllers_api.ObjectContainerHotel:
+    properties:
+      affiliations:
+        items:
+          $ref: '#/definitions/pkg_controllers_api.typeList'
+        type: array
+      consortias:
+        items:
+          $ref: '#/definitions/pkg_controllers_api.typeList'
+        type: array
+      loyalty_programs:
+        items:
+          $ref: '#/definitions/pkg_controllers_api.typeList'
+        type: array
+      partner_programs:
+        items:
+          $ref: '#/definitions/pkg_controllers_api.typeList'
+        type: array
+    type: object
+  pkg_controllers_api.SupportMessage:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      message:
+        type: string
+      reasonContact:
+        type: string
+      secondName:
+        type: string
+      selectedCountry:
+        type: string
+      stateOrProvince:
+        type: string
+      userId:
+        type: string
+    type: object
+  pkg_controllers_api.TrvlrTeamPayload:
+    properties:
+      email:
+        type: string
+      fbId:
+        type: string
+      name:
+        type: string
+      secret:
+        type: string
+    type: object
+  pkg_controllers_api.TrvlrTeamSecretPayload:
+    properties:
+      response:
+        type: boolean
+      secret:
+        type: string
+    type: object
+  pkg_controllers_api.UpdateOrderBody:
+    properties:
+      OrderItems:
+        items:
+          $ref: '#/definitions/OrderItem'
+        type: array
+      new_checkin_date:
+        type: string
+      new_checkout_date:
+        type: string
+      order_id:
+        type: integer
+    type: object
+  pkg_controllers_api.typeList:
+    properties:
+      display_name:
+        type: string
+      id:
+        type: integer
+    type: object
+  pkg_entity.AccountOwnerType:
+    enum:
+    - agency_users
+    - hotel_users
+    - travelers
+    type: string
+    x-enum-varnames:
+    - AccountOwnerType_AGENCY_USERS
+    - AccountOwnerType_HOTEL_USERS
+    - AccountOwnerType_TRAVELER
+  pkg_entity.AddressType:
+    enum:
+    - ADYEN_LEGAL_ENTITY
+    - ONBOARDING_ADDRESS
+    type: string
+    x-enum-varnames:
+    - ADYEN_LEGAL_ENTITY_ADDRESS
+    - ONBOARDING_ADDRESS
+  pkg_entity.CompanyStatus:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    type: integer
+    x-enum-varnames:
+    - CompanyStatus_DISABLED
+    - CompanyStatus_ONBOARDING_PENDING
+    - CompanyStatus_ONBOARDING_STARTED
+    - CompanyStatus_ACTIVE
+  pkg_entity.FbUserStatus:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    type: integer
+    x-enum-varnames:
+    - FbUserStatus_DISABLED
+    - FbUserStatus_WAITING_EMAIL_VALIDATION
+    - FbUserStatus_WAITING_SIGNUP_MODE
+    - FbUserStatus_WAITING_ONBOARDING
+    - FbUserStatus_ENABLED
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server Petstore server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /api//fbuser-referral:
+    post:
+      consumes:
+      - application/json
+      description: Create Referred Account
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.CreateReferredAccountRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FirebaseUser'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Referred Account
+      tags:
+      - Firebase
+  /api/agency/profile/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update agency by id
+      parameters:
+      - description: agency id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: agency body
+        in: body
+        name: agency
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.AgencyUpdateRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrAgencyResponseDto'
+        "400":
+          description: 'message": "error message"}'
+          schema:
+            type: json
+      security:
+      - ApiKeyAuth: []
+      summary: Update Agency By Id
+      tags:
+      - Agency
+  /api/agency/programs:
+    get:
+      consumes:
+      - application/json
+      description: Get agency programs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg_controllers_api.ObjectContainerAgency'
+        "400":
+          description: 'Bad Request: error message'
+          schema:
+            type: string
+        "500":
+          description: 'Internal Server Error: Could not encode the response'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get Agency Programs
+      tags:
+      - Agency
+  /api/agency_user/{id}:
+    get:
+      description: Get agency user by id
+      parameters:
+      - description: agency user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AgencyUser'
+        "400":
+          description: Bad Request
+      security:
+      - ApiKeyAuth: []
+      summary: Get Agency User by Id
+      tags:
+      - Agency
+  /api/agency_user/hotels:
+    get:
+      consumes:
+      - application/json
+      description: Get Hotels By Name
+      parameters:
+      - description: hotel_name
+        in: query
+        name: hotel_name
+        required: true
+        type: string
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Hotel'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Hotels By Name
+      tags:
+      - Agency
+  /api/agency_users/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Update agency user role
+      parameters:
+      - description: agency id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/FirebaseUser'
+      - description: role
+        in: query
+        name: role
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvleAgencyManageProfileResponseDto'
+        "500":
+          description: 'desc" Internal Server Error: Error GetById'
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_utils.ErrorResponse'
+            - properties:
+                error:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update Agency User Role
+      tags:
+      - Agency
+  /api/agency_users/{id}/travelers:
+    get:
+      description: get agency user travelers by agency id
+      parameters:
+      - description: agency id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: pmt
+        in: query
+        name: pmt
+        required: true
+        type: boolean
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetAgencyUserTravelersByAgencyIdResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Agency User Travelers By Agency Id
+      tags:
+      - Agency
+  /api/agency_users/agents/{id}:
+    get:
+      description: Get all agents by agency id
+      parameters:
+      - description: agency id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: name
+        in: query
+        name: name
+        type: string
+      - description: email
+        in: query
+        name: email
+        type: string
+      - description: location
+        in: query
+        name: location
+        type: string
+      - description: size
+        in: query
+        name: size
+        type: integer
+      - description: sort
+        in: query
+        name: sort
+        type: string
+      - description: order
+        in: query
+        name: order
+        type: string
+      - description: status
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetAgentsByAgencyResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Agents By Agency Id
+      tags:
+      - Agency
+  /api/agency_users/travelers:
+    get:
+      consumes:
+      - application/json
+      description: Get Travelers By Agency User Id
+      parameters:
+      - description: agency user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Traveler'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Travelers By Agency User Id
+      tags:
+      - Agency
+  /api/booking:
+    patch:
+      consumes:
+      - application/json
+      description: Modify booking
+      parameters:
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrModifyBookingDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrModifyBookingResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Modify booking
+      tags:
+      - Booking
+  /api/commission:
+    post:
+      consumes:
+      - application/json
+      description: Create Commission
+      parameters:
+      - description: Commission
+        in: body
+        name: commission
+        required: true
+        schema:
+          $ref: '#/definitions/pkg_controllers_api.CreateCommissionParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Commission'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Commission
+      tags:
+      - Commission
+  /api/commission/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Commission By Id
+      parameters:
+      - description: Commission ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Commission'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Commission By Id
+      tags:
+      - Commission
+  /api/commission/agency/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Commissions And Hotels
+      parameters:
+      - description: Agency ID
+        in: path
+        name: agency_id
+        required: true
+        type: integer
+      - description: Page Number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Commission Min
+        in: query
+        name: commision_min
+        required: true
+        type: integer
+      - description: Commission Max
+        in: query
+        name: commision_max
+        required: true
+        type: integer
+      - description: Address
+        in: query
+        name: address
+        type: string
+      - description: Hotel ID
+        in: query
+        name: hotel_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetCommissionsAndHotelsResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Commissions And Hotels
+      tags:
+      - Commission
+  /api/commission/hotel/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Hotel Commissions And Advisors
+      parameters:
+      - description: hotel id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: commission min
+        in: query
+        name: commission_min
+        required: true
+        type: integer
+      - description: commission max
+        in: query
+        name: commission_max
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Get Hotel Commissions And Advisors
+      tags:
+      - Commission
+  /api/commission/update:
+    post:
+      consumes:
+      - application/json
+      description: Update Commission
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.UpdateCommissionRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.UpdateCommissionRequestDTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Update Commission
+      tags:
+      - Commission
+  /api/contact:
+    post:
+      consumes:
+      - application/json
+      description: Send Contact Message
+      parameters:
+      - description: Contact Message
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/pkg_controllers_api.ContactMessage'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg_controllers_api.ContactMessage'
+      security:
+      - ApiKeyAuth: []
+      summary: Send Contact Message
+      tags:
+      - Support
+  /api/fbuser:
+    post:
+      consumes:
+      - application/json
+      description: Create firebase user
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/FirebaseUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FirebaseUser'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Firebase User
+      tags:
+      - Firebase
+  /api/fbuser/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get firebase user by UID
+      parameters:
+      - description: firebase uid
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FirebaseUser'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Firebase User By UID
+      tags:
+      - Firebase
+    patch:
+      consumes:
+      - application/json
+      description: Update firebase user
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/FirebaseUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FirebaseUser'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Firebase User
+      tags:
+      - Firebase
+  /api/fbusers:
+    get:
+      description: Get Firebase Users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/FirebaseUser'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Get Firebase Users
+      tags:
+      - Firebase
+  /api/hotel/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Traveler Hotel By ID
+      parameters:
+      - description: Hotel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Hotel'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Traveler Hotel By ID
+      tags:
+      - Hotel
+  /api/hotel/profile/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update Profile Property By Id
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.HotelUpdateRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrHotelResponseDto'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Profile Property By Id
+      tags:
+      - Hotel
+  /api/hotel_users/{id}:
+    delete:
+      description: Delete Hotel User By Id
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Hotel User By Id
+      tags:
+      - Hotel
+    get:
+      description: Get Hotel By User Id
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Hotel'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Hotel By User Id
+      tags:
+      - Hotel
+    patch:
+      consumes:
+      - application/json
+      description: Update Hotel User Role
+      parameters:
+      - description: hotel user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/FirebaseUser'
+      - description: new role
+        in: query
+        name: role
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvleHotelManageProfileResponseDto'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Hotel User Role
+      tags:
+      - Hotel
+  /api/hotel_users/hotel/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Users By Hotel Id
+      parameters:
+      - description: hotel id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelUsersResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Users By Hotel Id
+      tags:
+      - Hotel
+  /api/integration/dhisco/fetch_property:
+    patch:
+      consumes:
+      - application/json
+      description: dhisco fetch property
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto_dhisco.FetchPropertyDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto_dhisco.ResponseDhiscoHdiDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: dhisco fetch property
+      tags:
+      - Webhooks
+  /api/new-client:
+    post:
+      consumes:
+      - application/json
+      description: Create Client
+      parameters:
+      - description: Traveler
+        in: body
+        name: traveler
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.CreateClientRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Traveler'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Client
+      tags:
+      - Traveler
+  /api/onboarding-hosted:
+    post:
+      consumes:
+      - application/json
+      description: Hosted Onboarding
+      parameters:
+      - description: Onboarding
+        in: body
+        name: onboarding
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.HostedOnboardingRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_adyen.HostedOnboardingResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Hosted Onboarding
+      tags:
+      - Onboarding
+  /api/onboarding/invite:
+    post:
+      consumes:
+      - application/json
+      description: Send referral link to user
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SendReferralLinkBodyRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Send Referral Link
+      tags:
+      - Onboarding
+  /api/onboarding/update:
+    post:
+      consumes:
+      - application/json
+      description: Onboarding update user
+      parameters:
+      - description: Onboarding Update User
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.OnboardingUpdateUserRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.OnboardingUpdateUserResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Onboarding Update User
+      tags:
+      - Onboarding
+  /api/order:
+    patch:
+      consumes:
+      - application/json
+      description: Update Order
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/pkg_controllers_api.UpdateOrderBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Order'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Order
+      tags:
+      - Order
+  /api/order/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Order Info
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetOrderInfoResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Order Info
+      tags:
+      - Order
+  /api/orders/agency/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Orders By Agency
+      parameters:
+      - description: Agency ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Hotel
+        in: query
+        name: hotel
+        type: string
+      - description: Agent
+        in: query
+        name: agent
+        type: string
+      - description: Pax
+        in: query
+        name: pax
+        type: string
+      - description: Reservation ID
+        in: query
+        name: reservationId
+        type: string
+      - description: Checkout From
+        in: query
+        name: checkoutFrom
+        type: string
+      - description: Checkout To
+        in: query
+        name: checkoutTo
+        type: string
+      - description: Show Cancelled
+        in: query
+        name: showCancelled
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetOrdersByAgency'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Orders By Agency
+      tags:
+      - Order
+  /api/orders/agency_user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Orders By Agency User
+      parameters:
+      - description: Agency User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Page
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Hotel
+        in: query
+        name: hotel
+        type: string
+      - description: Pax
+        in: query
+        name: pax
+        type: string
+      - description: Reservation ID
+        in: query
+        name: reservationId
+        type: integer
+      - description: Checkout From
+        in: query
+        name: checkoutFrom
+        type: string
+      - description: Checkout To
+        in: query
+        name: checkoutTo
+        type: string
+      - description: Show Cancelled
+        in: query
+        name: showCancelled
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetOrdersByAgencyUser'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Orders By Agency User
+      tags:
+      - Order
+  /api/orders/hotel/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Orders By Hotel
+      parameters:
+      - description: Hotel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Page
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Agency
+        in: query
+        name: agency
+        type: string
+      - description: Agent
+        in: query
+        name: agent
+        type: string
+      - description: Pax
+        in: query
+        name: pax
+        type: string
+      - description: Reservation ID
+        in: query
+        name: reservationId
+        type: integer
+      - description: Checkout From
+        in: query
+        name: checkoutFrom
+        type: string
+      - description: Checkout To
+        in: query
+        name: checkoutTo
+        type: string
+      - description: Show Cancelled
+        in: query
+        name: showCancelled
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetOrdersByHotelIDResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Orders By Hotel
+      tags:
+      - Order
+  /api/orders/traveler/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Orders By Traveler ID
+      parameters:
+      - description: Traveler ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Page
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Checkout From
+        in: query
+        name: checkoutFrom
+        type: string
+      - description: Checkout To
+        in: query
+        name: checkoutTo
+        type: string
+      - description: Hotel Name
+        in: query
+        name: hotelName
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg_controllers_api.GetOrdersByTravelerIDResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Orders By Traveler ID
+      tags:
+      - Order
+  /api/support:
+    post:
+      consumes:
+      - application/json
+      description: Send Support Message
+      parameters:
+      - description: Support Message
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/pkg_controllers_api.SupportMessage'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg_controllers_api.SupportMessage'
+      security:
+      - ApiKeyAuth: []
+      summary: Send Support Message
+      tags:
+      - Support
+  /api/traveler:
+    post:
+      consumes:
+      - application/json
+      description: Create Traveler
+      parameters:
+      - description: Traveler
+        in: body
+        name: traveler
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.Traveler'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Traveler'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Traveler
+      tags:
+      - Traveler
+    put:
+      consumes:
+      - application/json
+      description: Update Traveler
+      parameters:
+      - description: Traveler
+        in: body
+        name: traveler
+        required: true
+        schema:
+          $ref: '#/definitions/Traveler'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Traveler'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Traveler
+      tags:
+      - Traveler
+  /api/traveler/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Traveler
+      parameters:
+      - description: Traveler ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Traveler
+      tags:
+      - Traveler
+    get:
+      description: Get Traveler By Id
+      parameters:
+      - description: Traveler ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Traveler'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Traveler By Id
+      tags:
+      - Traveler
+    patch:
+      consumes:
+      - application/json
+      description: Update Traveler By Id
+      parameters:
+      - description: traveler id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: update traveler
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.UpdateTravlerRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FirebaseUser'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Traveler By Id
+      tags:
+      - Traveler
+  /api/traveler/{id}/company:
+    get:
+      consumes:
+      - application/json
+      description: Get Traveler Agency By Id
+      parameters:
+      - description: traveler id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Traveler'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Traveler Agency By Id
+      tags:
+      - Traveler
+  /api/trvlr-team/secret:
+    post:
+      consumes:
+      - application/json
+      description: Checks trvlr team secret
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/pkg_controllers_api.TrvlrTeamSecretPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg_controllers_api.TrvlrTeamSecretPayload'
+      security:
+      - ApiKeyAuth: []
+      summary: Trvlr Team Secret
+      tags:
+      - Traveler Team
+  /api/trvlr-team/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Create traveler team user
+      parameters:
+      - description: Traveler Team Payload
+        in: body
+        name: traveler
+        required: true
+        schema:
+          $ref: '#/definitions/pkg_controllers_api.TrvlrTeamPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg_controllers_api.TrvlrTeamPayload'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Traveler Team User
+      tags:
+      - Traveler Team
+  /api/v2/agency/invoices/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Generate agency invoice
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrAgencyInvoiceResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Generate Agency Invoice
+      tags:
+      - Invoices
+  /api/v2/agency/reports/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Agency Payouts Reports
+      parameters:
+      - description: Agency ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Page
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Status
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrAgencyPayoutsReponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Agency Payouts Reports
+      tags:
+      - Reports
+  /api/v2/agency/reports/{id}/csv:
+    get:
+      consumes:
+      - application/json
+      description: Export Agency Payouts Reports As CSV
+      parameters:
+      - description: Agency ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Status
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetReportsCSVResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Agency Payouts Reports CSV
+      tags:
+      - Reports
+  /api/v2/bonotel-session-token:
+    post:
+      consumes:
+      - application/json
+      description: Generate Bonotel Session Token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_bonotel.TokenSession'
+      security:
+      - ApiKeyAuth: []
+      summary: Generate Bonotel Session Token
+      tags:
+      - Integration
+  /api/v2/cancel-booking:
+    post:
+      consumes:
+      - application/json
+      description: Cancel booking
+      parameters:
+      - description: Cancel Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrBookingCancelationRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_typings.HgBookingCancelationResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Cancel Booking
+      tags:
+      - Booking
+  /api/v2/cards:
+    post:
+      consumes:
+      - application/json
+      description: Create Credit Card
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.CreateCreditCardRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/CreditCard'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Credit Card
+      tags:
+      - Card
+  /api/v2/cards/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Credit Card
+      parameters:
+      - description: Card ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/CreditCard'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Credit Card
+      tags:
+      - Card
+  /api/v2/cards/public-key:
+    get:
+      consumes:
+      - application/json
+      description: Get Public Key
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetPublicKeyResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Public Key
+      tags:
+      - Card
+  /api/v2/fbuser/send-verify-email/{uid}:
+    post:
+      consumes:
+      - application/json
+      description: Send verification email
+      parameters:
+      - description: firebase uid
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SendVerificationEmailRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SendVerificationEmailResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Send Verification Email
+      tags:
+      - Firebase V2
+  /api/v2/fbuser/verify-email/{uid}:
+    post:
+      consumes:
+      - application/json
+      description: Verify firebase user
+      parameters:
+      - description: firebase uid
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrVerifyEmailResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Verify Firebase User
+      tags:
+      - Firebase V2
+  /api/v2/get/cards:
+    get:
+      consumes:
+      - application/json
+      description: Get Credit Cards
+      parameters:
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: userType
+        in: query
+        name: userType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrGetCardsResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Credit Cards
+      tags:
+      - Card
+  /api/v2/hotel-programs:
+    get:
+      consumes:
+      - application/json
+      description: Get hotel programs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg_controllers_api.ObjectContainerHotel'
+      summary: Get hotel programs
+      tags:
+      - Hotel
+  /api/v2/hotels:
+    get:
+      consumes:
+      - application/json
+      description: Search hotels based by country, city and hotels name.
+      parameters:
+      - description: info
+        in: query
+        name: info
+        type: string
+      - description: accountOwnerID
+        in: query
+        name: accountOwnerID
+        required: true
+        type: string
+      - description: accountOwnerType
+        in: query
+        name: accountOwnerType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.SearchResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Search HG Hotel
+      tags:
+      - Search
+  /api/v2/hotels/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Hotel Integration Data
+      parameters:
+      - description: Integration Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Get Hotel Integration Data
+      tags:
+      - Integration
+    patch:
+      consumes:
+      - application/json
+      description: Update Hotel By Id
+      parameters:
+      - description: Hotel Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Hotel updated successfully
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update Hotel By Id
+      tags:
+      - HyperGuest Maintenance
+  /api/v2/hotels/book:
+    post:
+      consumes:
+      - application/json
+      description: Send booking
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrCreateBookingDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrCreateBookingResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Send booking
+      tags:
+      - Booking
+  /api/v2/hotels/destination/search:
+    get:
+      consumes:
+      - application/json
+      description: Get hotels by location
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrSearchDestinationRequestDto'
+      - description: accountOwnerID
+        in: query
+        name: accountOwnerID
+        required: true
+        type: string
+      - description: accountOwnerType
+        in: query
+        name: accountOwnerType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrSearchDestinarionResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Get hotels by location
+      tags:
+      - Search
+  /api/v2/hotels/invoices/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Generate hotel invoice
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrHotelInvoiceResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Generate Hotel Invoice
+      tags:
+      - Invoices
+  /api/v2/hotels/search:
+    post:
+      consumes:
+      - application/json
+      description: Get Hotels By Multis Id
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrSearchRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.GetHotelsByMultisIdResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Hotels By Multis Id
+      tags:
+      - Search
+  /api/v2/hotels/update:
+    get:
+      consumes:
+      - application/json
+      description: Get All Hotels Simple Update
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Hotels Simple Update
+      tags:
+      - HyperGuest Maintenance
+    patch:
+      consumes:
+      - application/json
+      description: Full Update All Hotels
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Syncing detailed info from hotels with HyperGuest
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Full Update All Hotels
+      tags:
+      - HyperGuest Maintenance
+  /api/v2/hotels/update/vervotech:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Upsert hotels in the masterHotelMultiples database table
+        based on data from a vervotech service for each providerId provided in the request body.
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrUpsertHotelMasterMultiplesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Upsert Hotels
+      tags:
+      - Integration
+  /api/v2/image/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Send profile image
+      parameters:
+      - description: firebase uid
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Send Profile Image
+      tags:
+      - Firebase
+  /api/v2/integration/dhisco/get-rate-rules-details:
+    post:
+      consumes:
+      - application/json
+      description: Get Rate Rules Details
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrRateRulesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrRateRulesResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Rate Rules Details
+      tags:
+      - Integration
+  /api/v2/invoices/all:
+    post:
+      consumes:
+      - application/json
+      description: Generate All Invoices
+      parameters:
+      - description: agency
+        in: query
+        name: agency
+        type: string
+      - description: hotel
+        in: query
+        name: hotel
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrGenereateAllInvoiceResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Generate All Invoices
+      tags:
+      - Invoices
+  /api/v2/orders/pay:
+    post:
+      consumes:
+      - application/json
+      description: Pay Booking
+      parameters:
+      - description: Pay Order Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.PayOrderRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Order'
+      security:
+      - ApiKeyAuth: []
+      summary: Pay Booking
+      tags:
+      - Order
+  /api/v2/sign-up/bulk/agency-users:
+    post:
+      consumes:
+      - application/json
+      description: Bulk create referred account
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.RequestBulkCreateReferredAccountDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/FirebaseUser'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Bulk Create Referred Account
+  /api/v2/update/cards:
+    patch:
+      consumes:
+      - application/json
+      description: Update Card Default
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrUpdateDefaultCard'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrUpdateDefaultCard'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Card Default
+      tags:
+      - Card
+  /api/v2/upload/logo:
+    post:
+      consumes:
+      - application/json
+      description: Upload image to TRVLR bucket
+      parameters:
+      - description: file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrUpdateAgencyLogoReponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Upload Image To TRVLR Bucket
+      tags:
+      - Firebase V2
+  /api/verificator_user/{id}:
+    get:
+      description: get verificator user by id
+      parameters:
+      - description: verificator user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/VerificatorUser'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Verificator user by id
+      tags:
+      - Agency
+  /api/webhook/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Webhook By PSP Reference
+      parameters:
+      - description: PSP Reference ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Get Webhook By PSP Reference
+      tags:
+      - Webhooks
+  /hotels/{id}/logo:
+    post:
+      consumes:
+      - application/json
+      description: Send Hotel Logo
+      parameters:
+      - description: Hotel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Hotel Logo
+        in: formData
+        name: logo
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      security:
+      - ApiKeyAuth: []
+      summary: Send Hotel Logo
+      tags:
+      - Hotel
+  /public/countries:
+    get:
+      description: Get Countries
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrGetCountriesResponse'
+      summary: Get Countries
+      tags:
+      - Public
+  /public/getUrlParametersByToken:
+    get:
+      consumes:
+      - application/json
+      description: Get Url Parameters By Token
+      parameters:
+      - description: Partner Code
+        in: query
+        name: partnerCode
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.IdentifierParamMappingsDTO'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Get Url Parameters By Token
+      tags:
+      - Integration
+  /public/mail-test:
+    get:
+      description: Get Mail Test
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Get Mail Test
+      tags:
+      - Public
+  /public/notifications/balance-platform:
+    post:
+      description: Balance Platform Notifications
+      responses:
+        "200":
+          description: OK
+      summary: Balance Platform Notifications
+      tags:
+      - Public
+  /public/notifications/customer-area:
+    post:
+      description: Customer Area Notifications
+      responses:
+        "200":
+          description: OK
+      summary: Customer Area Notifications
+      tags:
+      - Public
+  /public/onboarding-start:
+    post:
+      consumes:
+      - application/json
+      description: Sends onboarding mail to user email
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.OnboardingEmailRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Onboarding Mail
+      tags:
+      - Public
+  /public/partners:
+    get:
+      description: Get Partners Config
+      parameters:
+      - description: Partner Name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_atena-solutions_trvlr-svcmesh_pkg_dto.TrvlrGetPartnerConfigResponse'
+      summary: Get Partners Config
+      tags:
+      - Public
+  /public/terms/agencies:
+    get:
+      description: Get Agency Terms and Conditions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Get Agency Terms and Conditions
+      tags:
+      - Public
+  /public/terms/hotels:
+    get:
+      description: Get Hotel Terms and Conditions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Get Hotel Terms and Conditions
+      tags:
+      - Public
+  /public/verification/agency/count:
+    patch:
+      consumes:
+      - application/json
+      description: Get Agency Verification Count
+      parameters:
+      - description: accountOwnerID
+        in: query
+        name: accountOwnerID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+      summary: Get Agency Verification Count
+      tags:
+      - Public
+  /public/verification/agency/list/{method}:
+    get:
+      description: Get Agency Verification List
+      parameters:
+      - description: method
+        in: query
+        name: method
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Get Agency Verification List
+      tags:
+      - Public
+  /public/verification/bulk-upload:
+    post:
+      description: Bulk Upload
+      parameters:
+      - description: accountOwnerID
+        in: query
+        name: accountOwnerID
+        required: true
+        type: integer
+      - description: file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+      summary: Bulk Upload
+  /public/verification/create-user:
+    post:
+      description: Create User
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/pkg_controllers_api.BodyDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Create User
+      tags:
+      - Public
+  /public/verification/force-bulk-update:
+    patch:
+      consumes:
+      - application/json
+      description: Force Bulk Update
+      parameters:
+      - description: accountOwnerID
+        in: query
+        name: accountOwnerID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+      summary: Force Bulk Update
+      tags:
+      - Public
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    scopes:
+      admin: Grants read and write access to administrative information
+      write: Grants write access
+    type: apiKey
+swagger: "2.0"
